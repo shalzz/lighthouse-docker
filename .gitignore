@@ -2,3 +2,4 @@ network/
 secrets/
 .lighthouse/
 .env
+lighthouse-data

@@ -2,9 +2,9 @@ version: "3.0"
 
 services:
     beacon_node:
-        image: sigp/lighthouse:latest
+        image: syuan100/lighthouse:latest_arm64
         volumes:
-            - ./lighthouse-data:/root/.lighthouse
+            - lighthouse-data:/root/.lighthouse
             - ./scripts:/root/scripts
             - ./network:/root/network
         ports:
@@ -15,17 +15,16 @@ services:
         env_file: .env
         command: sh /root/scripts/start-beacon-node.sh
     validator_client:
-        image: sigp/lighthouse:latest
+        image: syuan100/lighthouse:latest_arm64
         volumes:
-            - ./lighthouse-data:/root/.lighthouse
+            - lighthouse-data:/root/.lighthouse
             - ./scripts:/root/scripts
         depends_on:
             - beacon_node
         env_file: .env
         command: sh /root/scripts/start-validator-client.sh
     geth:
-        build:
-            context: geth
+        image: syuan100/go-ethereum:1.9.16-arm64
         volumes:
             - geth:/root/.ethereum
             - ./scripts:/root/scripts
@@ -33,7 +32,17 @@ services:
             - 30303:30303/tcp
             - 30303:30303/udp
         env_file: .env
-        command: sh /root/scripts/start-geth.sh
-
+        command: ["--goerli", "--http", "--http.addr", "0.0.0.0", "--http.vhosts=*", "--cache", "512"]
 volumes:
-    geth:
+  geth:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/media/sda1/ethereum'
+  lighthouse-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/media/sda1/lighthouse-data'
