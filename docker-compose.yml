@@ -14,6 +14,7 @@ services:
             - 9000:9000/udp
         env_file: .env
         command: sh /root/scripts/start-beacon-node.sh
+        restart: unless-stopped
     validator_client:
         image: syuan100/lighthouse:latest_arm64
         volumes:
@@ -23,6 +24,7 @@ services:
             - beacon_node
         env_file: .env
         command: sh /root/scripts/start-validator-client.sh
+        restart: unless-stopped
     geth:
         image: syuan100/go-ethereum:1.9.16-arm64
         volumes:
@@ -33,6 +35,7 @@ services:
             - 30303:30303/udp
         env_file: .env
         command: ["--goerli", "--http", "--http.addr", "0.0.0.0", "--http.vhosts=*", "--cache", "512"]
+        restart: unless-stopped
 volumes:
   geth:
     driver: local
