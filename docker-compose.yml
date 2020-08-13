@@ -2,7 +2,8 @@ version: "3.0"
 
 services:
     beacon_node:
-        image: syuan100/lighthouse:latest_arm64
+        build:
+            context: lighthouse
         volumes:
             - lighthouse-data:/root/.lighthouse
             - ./scripts:/root/scripts
@@ -13,20 +14,22 @@ services:
             - 9000:9000/tcp
             - 9000:9000/udp
         env_file: .env
-        command: sh /root/scripts/start-beacon-node.sh
+        command: /root/scripts/start-beacon-node.sh
         restart: unless-stopped
     validator_client:
-        image: syuan100/lighthouse:latest_arm64
+        build:
+            context: lighthouse
         volumes:
             - lighthouse-data:/root/.lighthouse
             - ./scripts:/root/scripts
         depends_on:
             - beacon_node
         env_file: .env
-        command: sh /root/scripts/start-validator-client.sh
+        command: /root/scripts/start-validator-client.sh
         restart: unless-stopped
     geth:
-        image: syuan100/go-ethereum:1.9.16-arm64
+        build:
+            context: geth
         volumes:
             - geth:/root/.ethereum
             - ./scripts:/root/scripts
@@ -34,7 +37,7 @@ services:
             - 30303:30303/tcp
             - 30303:30303/udp
         env_file: .env
-        command: ["--goerli", "--http", "--http.addr", "0.0.0.0", "--http.vhosts=*", "--cache", "512"]
+        command: sh /root/scripts/start-geth.sh
         restart: unless-stopped
 volumes:
   geth:
